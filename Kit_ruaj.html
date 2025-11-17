@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kit Terapéutico Interactivo 🌿</title>
+<link rel="manifest" href="manifest.json">
+<style>
+  :root {
+    --verde: #40916c;
+    --suave: #d8f3dc;
+    --fondo: #f7fcfa;
+  }
+  body {
+    font-family: "Poppins", sans-serif;
+    background: var(--fondo);
+    margin: 0; padding: 0;
+    display: flex; flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+  }
+  header {
+    background: var(--verde);
+    color: white;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0;
+  }
+  main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: start;
+    width: 100%;
+    max-width: 480px;
+    padding: 20px;
+  }
+  .card, .form-inicio, .reflexion-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    width: 100%;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    margin-top: 20px;
+  }
+  .oculto { display: none; }
+  select, input, textarea, button {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+  }
+  select, input, textarea {
+    background: #f0f0f0;
+  }
+  button {
+    background: var(--verde);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:hover { background: #2e684e; }
+  textarea { min-height: 80px; resize: none; }
+  footer {
+    text-align: center;
+    padding: 10px;
+    font-size: 0.85rem;
+    color: #777;
+  }
+</style>
+</head>
+<body>
+<header><h2>🌿 Kit Terapéutico Ruaj</h2></header>
+<main>
+  <!-- Pantalla de registro -->
+  <div id="pantallaInicio" class="form-inicio">
+    <h3>Bienvenido/a</h3>
+    <p>Antes de comenzar, por favor completa tus datos:</p>
+    <input id="nombre" type="text" placeholder="Tu nombre" required>
+    <input id="email" type="email" placeholder="Tu correo electrónico" required>
+    <button onclick="iniciarSesion()">Comenzar</button>
+  </div>
+  <!-- App principal -->
+  <div id="appPrincipal" class="oculto">
+    <select id="categoria">
+      <option value="emocional">💗 Emocional</option>
+      <option value="mental">🧠 Mental</option>
+      <option value="fisica">🌿 Física</option>
+    </select>
+    <button onclick="mostrarTarjeta()">Sacar tarjeta</button>
+
+    <div id="tarjeta" class="card">🌸 Tu pregunta aparecerá aquí</div>
+    <div id="dinamica" class="card">Selecciona una categoría para ver su dinámica.</div>
+
+    <div class="reflexion-card">
+      <label for="reflexion"><strong>Tu reflexión:</strong></label>
+      <textarea id="reflexion" placeholder="Escribe lo que sientes..."></textarea>
+      <button onclick="guardarReflexion()">💾 Guardar reflexión</button>
+    </div>
+  </div>
+</main>
+<footer>Creado con amor para tu transformación 🌸</footer>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby2GV7b3P0UFfTl1BKNTT47HGhLO4-vdE1DdcYTljZq3H1gphYHLgoMnF4ejKYvfJnL/exec"; // 🔗 Reemplázalo
+const preguntas = {
+  emocional: [
+    "¿Qué emoción estoy negando o evitando sentir en este momento?",
+    "¿Dónde siento esta emoción en el cuerpo?",
+    "¿Qué mensaje tiene para mí esta emoción si la escucho sin juicio?",
+    "¿Qué me haría sentir más seguro(a) para expresarla plenamente?",
+    "¿Qué emociones heredadas o aprendidas estoy listo(a) para liberar?"
+  ],
+  mental: [
+    "¿Qué pensamientos repetitivos me mantienen atrapado(a) en un bucle?",
+    "¿Qué creencia sostiene este pensamiento?",
+    "¿Qué beneficios inconscientes obtengo al mantener esta creencia?",
+    "¿Qué pasaría si decidiera creer lo contrario durante una semana?",
+    "¿Qué afirmación consciente quiero sembrar hoy?"
+  ],
+  fisica: [
+    "¿Dónde se acumula la tensión en mi cuerpo cuando estoy bajo estrés?",
+    "¿Qué parte de mi cuerpo me pide atención o descanso hoy?",
+    "¿Qué emociones reconozco alojadas en mi cuerpo?",
+    "¿Qué movimientos o posturas me ayudan a liberar energía estancada?",
+    "¿Qué gesto pequeño puedo hacer hoy para honrar mi cuerpo?"
+  ]
+};
+const dinamicas = {
+  emocional:
+    "🌀 <strong>Dinámica:</strong> Escribe una emoción recurrente, háblale, agradécele y suéltala (puedes romper la hoja con intención de liberación).",
+  mental:
+    "💫 <strong>Dinámica:</strong> Identifica tus creencias limitantes y reescríbelas en versiones expansivas. Repítelas frente al espejo una semana.",
+  fisica:
+    "🌿 <strong>Dinámica:</strong> Haz un escaneo corporal consciente, siente cada parte, agradece y visualiza luz liberando tensión."
+};
+
+function iniciarSesion() {
+  const nombre = document.getElementById("nombre").value.trim();
+  const email = document.getElementById("email").value.trim();
+  if (!nombre || !email) {
+    alert("Por favor completa todos los campos.");
+    return;
+  }
+  localStorage.setItem("nombreUsuario", nombre);
+  localStorage.setItem("emailUsuario", email);
+  document.getElementById("pantallaInicio").classList.add("oculto");
+  document.getElementById("appPrincipal").classList.remove("oculto");
+}
+
+function mostrarTarjeta() {
+  const categoria = document.getElementById("categoria").value;
+  const lista = preguntas[categoria];
+  const pregunta = lista[Math.floor(Math.random() * lista.length)];
+  document.getElementById("tarjeta").innerText = pregunta;
+  document.getElementById("dinamica").innerHTML = dinamicas[categoria];
+}
+
+async function guardarReflexion() {
+  const nombre = localStorage.getItem("nombreUsuario");
+  const email = localStorage.getItem("emailUsuario");
+  const categoria = document.getElementById("categoria").value;
+  const pregunta = document.getElementById("tarjeta").innerText;
+  const comentario = document.getElementById("reflexion").value.trim();
+
+  if (!pregunta || pregunta.includes("aparecerá") || comentario === "") {
+    alert("Primero selecciona una tarjeta y escribe tu reflexión.");
+    return;
+  }
+
+  const data = { nombre, email, categoria, pregunta, comentario };
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data)
+    });
+    alert("✨ Reflexión guardada con éxito.");
+    document.getElementById("reflexion").value = "";
+  } catch (e) {
+    console.error(e);
+    alert("Ocurrió un error al guardar en Drive.");
+  }
+}
+</script>
+
+<!-- Manifest y Service Worker -->
+<script>
+  // Registro del service worker para instalación
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js');
+    });
+  }
+</script>
+</body>
+</html>
